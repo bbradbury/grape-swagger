@@ -66,7 +66,7 @@ module Grape
               end
 
               routes_array = routes.keys.map do |local_route|
-                  { :path => "#{parse_path(route.route_path.gsub('(.:format)', ''),route.route_version)}/#{local_route}.{format}" }
+                  { :path => "#{parse_path(route.route_path.gsub('(.:format)', ''),route.route_version)}/#{local_route}" }
               end
               {
                 apiVersion: api_version,
@@ -91,7 +91,7 @@ module Grape
                 operations = {
                     :notes => notes,
                     :summary => route.route_description || '',
-                    :nickname   => route.route_method + route.route_path.gsub(/[\/:\(\)\.]/,'-'),
+                    :nickname   => route.route_method + parse_path(route.route_path).gsub(/[\/:\(\)\.]/,'-')),
                     :httpMethod => route.route_method,
                     :parameters => parse_header_params(route.route_headers) +
                       parse_params(route.route_params, route.route_path, route.route_method)
@@ -161,7 +161,7 @@ module Grape
 
             def parse_path(path, version)
               # adapt format to swagger format
-              parsed_path = path.gsub('(.:format)', '.{format}')
+              parsed_path = path.gsub('(.:format)', '')
               # This is attempting to emulate the behavior of
               # Rack::Mount::Strexp. We cannot use Strexp directly because
               # all it does is generate regular expressions for parsing URLs.
